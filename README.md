@@ -2,7 +2,7 @@
 
 **A local-first AI inbox triage tool with a React + FastAPI UI, a multi-provider LLM layer, and a safety-gated action engine that can actually touch Gmail — not just summarize it.**
 
-I built this in ~2 weeks as a portfolio piece while job-searching for PM / SWE / AI-engineering roles. It's meant to show how I use modern AI tools to design, implement, and ship a real product: not a toy, not a wrapper around a single API call, but something I actually run on my own inbox every morning.
+I built this in ~2 weeks as a portfolio piece while job-searching for Solutions Engineer, Implementation, and AI-engineering roles. It's meant to show how I use modern AI tools to design, implement, and ship a real product: not a toy, not a wrapper around a single API call, but something I actually run on my own inbox every morning.
 
 > **Transparent about the process:** I wrote this codebase _with_ AI assistance (Claude Code, Copilot-style suggestions, a lot of pair-prompting). Every line here was reviewed, shaped, and tested by me — the architecture, safety model, eval harness, and UX decisions are mine. This README is honest about what that collaboration looks like because the whole point of the project is to demonstrate what I can build when I use AI well.
 
