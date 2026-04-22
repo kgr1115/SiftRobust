@@ -1,0 +1,71 @@
+[
+  {
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-6",
+    "accuracy": 0.0,
+    "errors": 40,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "total_latency_ms": 0.0,
+    "wall_ms": 12761.84,
+    "estimated_cost_usd": 0.0,
+    "per_category_recall": {
+      "needs_reply": 0.0,
+      "fyi": 0.0,
+      "newsletter": 0.0,
+      "trash": 0.0,
+      "urgent": 0.0
+    }
+  },
+  {
+    "provider": "openai",
+    "model": "gpt-4o-mini",
+    "accuracy": 0.925,
+    "errors": 0,
+    "input_tokens": 60804,
+    "output_tokens": 1915,
+    "total_latency_ms": 55768.64949983428,
+    "estimated_cost_usd": 0.0102696,
+    "per_category_recall": {
+      "fyi": 1.0,
+      "trash": 0.6666666666666666,
+      "urgent": 1.0,
+      "newsletter": 1.0,
+      "needs_reply": 0.9
+    }
+  },
+  {
+    "provider": "google",
+    "model": "gemini-2.5-flash",
+    "accuracy": 0.925,
+    "errors": 0,
+    "input_tokens": 58679,
+    "output_tokens": 2576,
+    "total_latency_ms": 40748.44869997469,
+    "estimated_cost_usd": 0.0240437,
+    "per_category_recall": {
+      "fyi": 1.0,
+      "trash": 0.8333333333333334,
+      "urgent": 1.0,
+      "newsletter": 1.0,
+      "needs_reply": 0.8
+    }
+  },
+  {
+    "provider": "groq",
+    "model": "llama-3.3-70b-versatile",
+    "accuracy": 0.975,
+    "errors": 0,
+    "input_tokens": 48136,
+    "output_tokens": 1891,
+    "total_latency_ms": 210143.8500000222,
+    "estimated_cost_usd": 0.029894129999999998,
+    "per_category_recall": {
+      "urgent": 1.0,
+      "trash": 1.0,
+      "needs_reply": 1.0,
+      "newsletter": 0.875,
+      "fyi": 1.0
+    }
+  }
+]

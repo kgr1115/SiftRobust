@@ -1,0 +1,48 @@
+# --- Python -----------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# --- Virtualenvs ------------------------------------------------------------
+.venv/
+venv/
+env/
+
+# --- Node / web -------------------------------------------------------------
+web/node_modules/
+web/dist/
+web/.vite/
+web/vite.config.ts.timestamp-*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# --- Secrets + local state ---------------------------------------------------
+# NEVER commit credentials.json or token.json — OAuth refresh tokens
+# authenticate to the user's inbox. Keep them local.
+.env
+credentials.json
+token.json
+sift.db
+sift.db-journal
+
+# Local LLM interaction logs — per-call JSONL, not useful across machines.
+logs/
+
+# --- Editors ----------------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+web/tsconfig.tsbuildinfo
