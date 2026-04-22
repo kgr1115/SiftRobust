@@ -50,6 +50,9 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
+# Gmail's batch endpoint hard-caps at 100 sub-requests per multipart HTTP call.
+_GMAIL_BATCH_MAX = 100
+
 from .config import CONFIG, PROJECT_ROOT
 from .models import ComposeRequest, Draft, Label, SentThread, Thread
 
@@ -335,6 +338,64 @@ def _thread_to_model(thread_resource: dict[str, Any], self_email: str) -> Thread
     )
 
 
+def _batch_get(
+    svc: Any,
+    ids: list[str],
+    build_request: Any,
+    *,
+    kind: str = "item",
+) -> list[dict[str, Any]]:
+    """Fetch many resources in one HTTP round-trip via Gmail batch.
+
+    ``build_request`` is called with each id and must return a prepared
+    ``HttpRequest`` (e.g. ``svc.users().threads().get(...)``). Responses are
+    returned in the *input* order; per-sub-request failures are logged and
+    skipped, matching the prior serial loop's "skip and continue" behaviour.
+
+    Gmail's batch endpoint caps at 100 sub-requests per multipart call, so
+    we chunk. In practice the inbox UI caps at 100 threads, so this is a
+    single batch for typical loads — one HTTPS round-trip instead of N.
+    """
+    if not ids:
+        return []
+
+    results: dict[str, dict[str, Any]] = {}
+
+    def _cb(request_id: str, response: Any, exception: Any) -> None:
+        if exception is not None:
+            logger.warning(
+                "Skipping %s %s (fetch failed: %s)", kind, request_id, exception
+            )
+            return
+        results[request_id] = response
+
+    for start in range(0, len(ids), _GMAIL_BATCH_MAX):
+        chunk = ids[start : start + _GMAIL_BATCH_MAX]
+        batch = svc.new_batch_http_request(callback=_cb)
+        for rid in chunk:
+            batch.add(build_request(rid), request_id=rid)
+        try:
+            batch.execute()
+        except HttpError as e:
+            # If the batch endpoint itself fails we can still fall back to
+            # serial calls so the UI degrades gracefully rather than going
+            # blank. Keeps the old behaviour available as a safety net.
+            logger.warning(
+                "Gmail batch failed (%s); falling back to serial fetches", e
+            )
+            for rid in chunk:
+                if rid in results:
+                    continue
+                try:
+                    results[rid] = build_request(rid).execute()
+                except HttpError as inner:
+                    logger.warning(
+                        "Skipping %s %s (fetch failed: %s)", kind, rid, inner
+                    )
+
+    return [results[rid] for rid in ids if rid in results]
+
+
 def fetch_recent_threads(
     limit: int = 25,
     *,
@@ -372,14 +433,15 @@ def fetch_recent_threads(
     thread_stubs = resp.get("threads", []) or []
     logger.info("Gmail returned %d thread stubs (limit=%d)", len(thread_stubs), limit)
 
+    full_threads = _batch_get(
+        svc,
+        [s["id"] for s in thread_stubs],
+        lambda tid: svc.users().threads().get(userId="me", id=tid, format="full"),
+        kind="thread",
+    )
+
     threads: list[Thread] = []
-    for stub in thread_stubs:
-        tid = stub["id"]
-        try:
-            full = svc.users().threads().get(userId="me", id=tid, format="full").execute()
-        except HttpError as e:
-            logger.warning("Skipping thread %s (fetch failed: %s)", tid, e)
-            continue
+    for full in full_threads:
         model = _thread_to_model(full, self_email)
         if model is not None:
             threads.append(model)
@@ -674,14 +736,15 @@ def list_sent_threads(
     stubs = resp.get("threads", []) or []
     logger.info("Gmail returned %d sent-thread stubs (limit=%d)", len(stubs), limit)
 
+    full_threads = _batch_get(
+        svc,
+        [s["id"] for s in stubs],
+        lambda tid: svc.users().threads().get(userId="me", id=tid, format="full"),
+        kind="sent thread",
+    )
+
     out: list[SentThread] = []
-    for stub in stubs:
-        tid = stub["id"]
-        try:
-            full = svc.users().threads().get(userId="me", id=tid, format="full").execute()
-        except HttpError as e:
-            logger.warning("Skipping sent thread %s (fetch failed: %s)", tid, e)
-            continue
+    for full in full_threads:
         model = _sent_thread_to_model(full, self_email)
         if model is not None:
             out.append(model)
@@ -710,14 +773,15 @@ def fetch_sent_messages(
     stubs = resp.get("messages", []) or []
     logger.info("Gmail returned %d sent-message stubs (limit=%d)", len(stubs), limit)
 
+    full_messages = _batch_get(
+        svc,
+        [s["id"] for s in stubs],
+        lambda mid: svc.users().messages().get(userId="me", id=mid, format="full"),
+        kind="sent message",
+    )
+
     out: list[dict[str, str]] = []
-    for stub in stubs:
-        mid = stub["id"]
-        try:
-            full = svc.users().messages().get(userId="me", id=mid, format="full").execute()
-        except HttpError as e:
-            logger.warning("Skipping sent message %s (fetch failed: %s)", mid, e)
-            continue
+    for full in full_messages:
         body = _extract_body(full.get("payload", {}))
         if not body.strip():
             continue

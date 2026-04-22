@@ -29,9 +29,15 @@ export function InboxView() {
     return () => clearTimeout(h);
   }, [query]);
 
+  // staleTime of 60s + refetchOnWindowFocus: false means tabbing back to
+  // the app won't fire a fresh Gmail fetch; the user pulls with the Refresh
+  // button when they actually want new data. Biggest single UX win after
+  // the backend-side batch fetch.
   const inbox = useQuery({
     queryKey: ["inbox", limit, debouncedQuery],
     queryFn: () => api.inbox(limit, debouncedQuery || undefined),
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
   });
 
   const labels = useQuery({
@@ -43,7 +49,8 @@ export function InboxView() {
   const threads = inbox.data?.threads ?? [];
 
   // Classify everything we're showing. Server caches per-thread so repeats
-  // are cheap.
+  // are cheap, but we still avoid the extra round-trip by matching the
+  // inbox query's staleness window.
   const classify = useQuery({
     queryKey: ["classify", threads.map((t) => t.id).join(",")],
     queryFn: () =>
@@ -51,6 +58,8 @@ export function InboxView() {
         ? Promise.resolve({ classifications: [] as Classification[] })
         : api.classify(threads),
     enabled: threads.length > 0,
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
   });
 
   const classByThread: Record<string, Classification> = useMemo(() => {

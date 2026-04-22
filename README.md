@@ -215,6 +215,7 @@ A few specific things I'd highlight as a demonstration of effective AI-assisted 
 - **Typed error surface.** The frontend knows about `auth` vs `balance` vs `rate_limit` as discriminated types, not string matches on error messages. That kind of up-front schema work is what makes AI-assisted code maintainable instead of a pile of patches.
 - **Prompts as first-class files.** Reviewable, diffable, non-engineer-readable. The `classify.md` prompt has been through half a dozen iterations — all visible in `git log`.
 - **One facade, four providers.** Writing this portably from day one forced me to understand each SDK's structured-output mechanism instead of getting locked into one vendor's abstraction.
+- **Optimized the hot paths once the shape was right.** The first version fetched thread bodies with N serial `threads().get()` calls on every inbox load and re-fetched them on every tab-focus. Once the tool was clearly a keeper I swapped the loop for a single `BatchHttpRequest` multipart call (with a serial fallback if the batch endpoint errors) and added TanStack Query caching with a 60-second stale-time on the inbox and classify queries. Same batching pattern in the voice-learning Sent-folder scan. Boring engineering, but it's the difference between a demo and a tool I actually open every morning.
 
 ---
 
