@@ -6,6 +6,8 @@ I built this in ~2 weeks as a portfolio piece while job-searching for PM / SWE /
 
 > **Transparent about the process:** I wrote this codebase _with_ AI assistance (Claude Code, Copilot-style suggestions, a lot of pair-prompting). Every line here was reviewed, shaped, and tested by me — the architecture, safety model, eval harness, and UX decisions are mine. This README is honest about what that collaboration looks like because the whole point of the project is to demonstrate what I can build when I use AI well.
 
+> **Built by [Kyle Rauch](https://github.com/kgr1115)** · Cincinnati, OH · [kyle.g.rauch@gmail.com](mailto:kyle.g.rauch@gmail.com) · [LinkedIn](https://www.linkedin.com/in/kyle-rauch-b2984a75/)
+> Currently looking for Solutions Engineer / TAM / Implementation Consultant / CSE roles at AI-forward SaaS companies. Available immediately.
 ---
 
 ## What it does
