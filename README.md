@@ -22,6 +22,28 @@ Everything stays local — single user, on your laptop, your OAuth token, your S
 
 ---
 
+## Screenshots
+
+_Captured against the synthetic fixture inbox — no real messages shown._
+
+**Inbox with per-thread classifications and confidence scores**
+
+![Inbox view](docs/screenshots/01-inbox.png)
+
+**One-click morning brief — urgent items, drafts attached, FYI/newsletter rollup**
+
+![Morning brief](docs/screenshots/02-morning-brief.png)
+
+**Auto-apply with dry-run preview — safe-category whitelist, confidence floor, per-thread action table**
+
+![Auto-apply preview](docs/screenshots/03-auto-apply.png)
+
+**Settings dialog — hot-swap providers, inspect pricing and last-eval accuracy**
+
+![Settings](docs/screenshots/04-settings.png)
+
+---
+
 ## Why it's a useful portfolio piece
 
 Plenty of "ChatGPT for email" demos stop at "look, it wrote a summary." The interesting problems only start after that:
