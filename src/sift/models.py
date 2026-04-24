@@ -153,7 +153,7 @@ class ActionPolicy(BaseModel):
     dry_run: bool = True
 
     # Skip any classification below this confidence.
-    min_confidence: float = 0.75
+    min_confidence: float = 0.7
 
     # Category → list of label names to apply. Label is created if it doesn't exist.
     apply_labels: dict[Category, list[str]] = Field(default_factory=dict)
